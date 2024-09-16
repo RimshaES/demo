@@ -2,11 +2,13 @@ package com.example.demo.model.db.entity;
 
 import com.example.demo.model.enums.Gender;
 import com.example.demo.model.enums.UserStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AccessLevel;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +19,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.smartcardio.Card;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -54,15 +55,18 @@ public class User {
     Gender gender;
 
     @Column(name = "created_at")
+    @CreationTimestamp
     LocalDateTime createdAt;
 
     @Column(name = "updated_at")
+    @UpdateTimestamp
     LocalDateTime updatedAt;
 
     @Column(name = "status")
     UserStatus status;
 
     @OneToMany
+    @JsonManagedReference(value = "driver_cars")
     List<Car> cars;
 
 

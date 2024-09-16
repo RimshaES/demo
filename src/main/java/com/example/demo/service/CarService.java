@@ -1,13 +1,20 @@
 package com.example.demo.service;
 
 import com.example.demo.model.db.entity.Car;
+import com.example.demo.model.db.entity.User;
 import com.example.demo.model.db.repository.CarRepository;
 import com.example.demo.model.dto.request.CarInfoRequest;
+import com.example.demo.model.dto.request.CarToUserRequest;
 import com.example.demo.model.dto.response.CarInfoResponse;
 import com.example.demo.model.enums.CarStatus;
+import com.example.demo.utils.PaginationUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CarService {
 
+    private final UserService userService;
     private final ObjectMapper mapper;
     private final CarRepository carRepository;
 
@@ -69,8 +77,48 @@ public class CarService {
 
     }
 
-    public List<CarInfoResponse> getAllCars() {
-        return carRepository.findAll().stream()
+    public Page<CarInfoResponse> getAllCars(Integer page, Integer perPage, String sort, Sort.Direction order, String filter) {
+
+        Pageable pageRequest = PaginationUtil.getPageRequest(page, perPage, sort, order);
+        Page<Car> all;
+        if (filter == null) {
+            all = carRepository.findAllByStatusNot(pageRequest, CarStatus.DELETED);
+        } else {
+            all = carRepository.findAllByStatusNotFiltered(pageRequest, CarStatus.DELETED, filter.toLowerCase());
+        }
+        List<CarInfoResponse> content = all.getContent().stream()
+                .map(car -> mapper.convertValue(car, CarInfoResponse.class))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(content, pageRequest, all.getTotalElements());
+
+    }
+
+    public void addCarToUser(CarToUserRequest request) {
+        Car car = carRepository.findById(request.getCarId()).orElse(null);
+
+        if (car == null) {
+            return;
+        }
+
+        User userFromDb = userService.getUserFromDb(request.getUserId());
+
+        if (userFromDb == null) {
+            return;
+        }
+
+        userFromDb.getCars().add(car);
+
+        userService.updateUserData(userFromDb);
+
+        car.setUser(userFromDb);
+        carRepository.save(car);
+    }
+
+    public List<CarInfoResponse> getAllUserCars(Long userId) {
+        List<Car> allUserCars = carRepository.findAllByUserId(userId);
+
+        return allUserCars.stream()
                 .map(car -> mapper.convertValue(car, CarInfoResponse.class))
                 .collect(Collectors.toList());
     }

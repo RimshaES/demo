@@ -3,10 +3,13 @@ package com.example.demo.model.db.entity;
 import com.example.demo.model.enums.CarStatus;
 import com.example.demo.model.enums.Color;
 import com.example.demo.model.enums.Transmission;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -30,9 +33,11 @@ public class Car {
   Long id;
 
   @Column(name = "created_at")
+  @CreationTimestamp
   LocalDateTime createdAt;
 
   @Column(name = "updated_at")
+  @UpdateTimestamp
   LocalDateTime updatedAt;
 
   @Column(name = "status")
@@ -63,6 +68,7 @@ public class Car {
     Transmission transmission;
 
     @ManyToOne
+    @JsonBackReference(value = "driver_cars")
     User user;
 
 
