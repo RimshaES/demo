@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
@@ -16,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query("select u from User u where u.status <> :status and (lower(u.lastName) like %:filter% or lower(u.firstName) like %:filter%)")
     Page<User> findAllByStatusNotFiltered(Pageable request, UserStatus status, @Param("filter") String filter);
+
+    Optional<User> findByEmailIgnoreCase(String email);
+
 }
