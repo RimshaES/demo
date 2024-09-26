@@ -44,32 +44,30 @@ public class Car {
   @Enumerated(EnumType.STRING)
   CarStatus status;
 
-    @Column(name = "brand")
-    String brand;
+  @Column(name = "brand")
+  String brand;
 
-    @Column(name = "model")
-    String model;
+  @Column(name = "model")
+  String model;
 
-    @Column(name = "color")
-    @Enumerated(EnumType.STRING)
-    Color color;
+  @Column(name = "color")
+  @Enumerated(EnumType.STRING)
+  Color color;
 
-    @Column(name = "year")
-    Integer year;
+  @Column(name = "year")
+  Integer year;
 
-    @Column(name = "price")
-    Double price;
+  @Column(name = "price")
+  Double price;
 
-    @Column(name = "isNew")
-    Boolean isNew;
+  @Column(name = "isNew")
+  Boolean isNew;
 
-    @Column(name = "transmission")
-    @Enumerated(EnumType.STRING)
-    Transmission transmission;
+  @Column(name = "transmission")
+  @Enumerated(EnumType.STRING)
+  Transmission transmission;
 
-    @ManyToOne
-    @JsonBackReference(value = "driver_cars")
-    User user;
-
-
+  @ManyToOne
+  @JsonBackReference(value = "driver_cars")
+  User user;
 }
